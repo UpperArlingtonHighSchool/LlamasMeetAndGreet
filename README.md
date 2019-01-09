@@ -1,2 +1,2 @@
 # LlamasMeetAndGreet
-JC Yan, Ben Underwood, Avi Hari, Winston Basso-Schricker
+JC Yan, Ben Underwood, Winston Basso-Schricker, and Avi Hari
