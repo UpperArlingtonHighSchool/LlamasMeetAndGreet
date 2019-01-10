@@ -1,0 +1,93 @@
+package bc19;
+public class MyRobot extends BCAbstractRobot {
+	public int turn;
+
+    public Action turn() {
+    	turn++;
+
+    	if (me.unit == SPECS.CASTLE) {
+    		if (turn == 1) {
+    			log("Building a pilgrim.");
+    			return buildUnit(SPECS.PILGRIM,1,0);
+    		}
+    	}
+
+    	if (me.unit == SPECS.PILGRIM) {
+    		if(me.karbonite<19&&fuel>5) {
+    			double closestFuel=90000000;
+    			int y=0;
+    			int x=0;
+    			int[] closestFuelCord=new int[2];
+    			for(boolean[] a: karboniteMap) {
+                	         x=0;
+    				 for(boolean b: a) {
+    					 if(b==true){ //If there is fuel
+    						 if(Math.pow(x-me.x,2)+Math.pow(y-me.y, 2)<closestFuel) {
+    							 closestFuel=Math.pow(x-me.x,2)+Math.pow(y-me.y, 2);
+    							 closestFuelCord[0]=x;
+    							 closestFuelCord[1]=y;
+    						 }
+    					 }
+    				  x++;
+    				 }
+                	 y++;
+                	//log(Integer.toString([0][getVisibleRobots()[0].castle_talk]));
+    			}
+    			if(turn<10) {
+        			log("CLOSEST: "+closestFuelCord[0]+","+closestFuelCord[1]);
+        		}
+ 			x=closestFuelCord[0];
+			y=closestFuelCord[1];
+			if(Math.pow(x-me.x,2)+Math.pow(y-me.y, 2)==0){
+				return mine();
+			}else{
+	        		x=x-me.x;
+				y=y-me.y;
+				if(x>1){x=1;}
+				if(x<-1){x=-1;}
+				if(y>1){y=1;}
+				if(y<-1){y=-1;}
+				log("TRYING TO GO: "+x+" "+y);
+				return move(x, y);
+			}
+		}else if(me.karbonite>18){
+			double closestFuel=90000000;
+			int y=0;
+			int x=0;
+			int[] closestFuelCord=new int[2];
+			for(int[] a: getVisibleRobotMap()) {
+				x=0;
+				for(int b: a) {
+					if(b>0&&getRobot(b).team==me.team&&getRobot(b).unit==0){
+						if(Math.pow(x-me.x,2)+Math.pow(y-me.y, 2)<closestFuel) {
+							 closestFuel=Math.pow(x-me.x,2)+Math.pow(y-me.y, 2);
+    							 closestFuelCord[0]=x;
+    							 closestFuelCord[1]=y;
+						}
+					}
+				x++;
+				}
+			y++;
+			}
+			x=closestFuelCord[0];
+			y=closestFuelCord[1];
+			log("CLOSEST CASTE IS: "+x+" "+y);
+			if(x-me.x<2&&x-me.x>-2&&y-me.y>-2&&y-me.y<2){
+				return give(x-me.x,y-me.y,me.karbonite,0);
+			}else{
+				x=x-me.x;
+				y=y-me.y;
+				if(x>1){x=1;}
+				if(x<-1){x=-1;}
+				if(y>1){y=1;}
+				if(y<-1){y=-1;}
+				log("TRYING TO GO: "+x+" "+y);
+				return move(x, y);
+			}
+		}
+    	}
+
+    	return null;
+
+	}
+}
