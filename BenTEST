@@ -14,75 +14,31 @@ public class MyRobot extends BCAbstractRobot {
 
     	if (me.unit == SPECS.PILGRIM) {
     		if(me.karbonite<19&&fuel>5) {
-    			double closestFuel=90000000;
-    			int y=0;
-    			int x=0;
-    			int[] closestFuelCord=new int[2];
-    			for(boolean[] a: karboniteMap) {
-                	         x=0;
-    				 for(boolean b: a) {
-    					 if(b==true){ //If there is fuel
-    						 if(Math.pow(x-me.x,2)+Math.pow(y-me.y, 2)<closestFuel) {
-    							 closestFuel=Math.pow(x-me.x,2)+Math.pow(y-me.y, 2);
-    							 closestFuelCord[0]=x;
-    							 closestFuelCord[1]=y;
-    						 }
-    					 }
-    				  x++;
-    				 }
-                	 y++;
-                	//log(Integer.toString([0][getVisibleRobots()[0].castle_talk]));
-    			}
-    			if(turn<10) {
-        			log("CLOSEST: "+closestFuelCord[0]+","+closestFuelCord[1]);
-        		}
- 			x=closestFuelCord[0];
-			y=closestFuelCord[1];
-			if(Math.pow(x-me.x,2)+Math.pow(y-me.y, 2)==0){
+    			int[] CloseKarbCords=findKarbonite(me.x,me.y);//Find closest karbonite
+    			int xKarb=CloseKarbCords[0];//Store coordinates of closest Karbonite
+    			int yKarb=CloseKarbCords[1];
+			if(distance(me.x,me.y,xKarb,yKarb)==0){
 				return mine();
 			}else{
-	        		x=x-me.x;
-				y=y-me.y;
-				if(x>1){x=1;}
-				if(x<-1){x=-1;}
-				if(y>1){y=1;}
-				if(y<-1){y=-1;}
-				log("TRYING TO GO: "+x+" "+y);
-				return move(x, y);
+				int[] route=route(me.x,me.y,xKarb,yKarb); 
+	        	int xRoute=route[0];
+				int yRoute=route[1];
+				log("TRYING TO GO: "+xRoute+" "+yRoute);
+				return move(xRoute, yRoute);
 			}
-		}else if(me.karbonite>18){
-			double closestFuel=90000000;
-			int y=0;
-			int x=0;
-			int[] closestFuelCord=new int[2];
-			for(int[] a: getVisibleRobotMap()) {
-				x=0;
-				for(int b: a) {
-					if(b>0&&getRobot(b).team==me.team&&getRobot(b).unit==0){
-						if(Math.pow(x-me.x,2)+Math.pow(y-me.y, 2)<closestFuel) {
-							 closestFuel=Math.pow(x-me.x,2)+Math.pow(y-me.y, 2);
-    							 closestFuelCord[0]=x;
-    							 closestFuelCord[1]=y;
-						}
-					}
-				x++;
-				}
-			y++;
-			}
-			x=closestFuelCord[0];
-			y=closestFuelCord[1];
-			log("CLOSEST CASTE IS: "+x+" "+y);
-			if(x-me.x<2&&x-me.x>-2&&y-me.y>-2&&y-me.y<2){
-				return give(x-me.x,y-me.y,me.karbonite,0);
+		}else if(me.karbonite>18){ //If storage is full, go to castle
+			int[] CloseCastleCords=findCastle(me.x,me.y);
+			int xCastle=CloseCastleCords[0];
+			int yCastle=CloseCastleCords[1];
+			int[] route=route(me.x,me.y,xCastle,yCastle); 
+			int xRoute=route[0];
+			int yRoute=route[1];
+			log("CLOSEST CASTE IS at: "+xCastle+" "+yCastle);
+			if(distance(me.x,me.y,xCastle,yCastle)<2){
+				return give(xRoute,yRoute,me.karbonite,0);
 			}else{
-				x=x-me.x;
-				y=y-me.y;
-				if(x>1){x=1;}
-				if(x<-1){x=-1;}
-				if(y>1){y=1;}
-				if(y<-1){y=-1;}
-				log("TRYING TO GO: "+x+" "+y);
-				return move(x, y);
+				log("TRYING TO GO: "+xRoute+" "+yRoute);
+				return move(xRoute, yRoute);
 			}
 		}
     	}
@@ -90,4 +46,66 @@ public class MyRobot extends BCAbstractRobot {
     	return null;
 
 	}
+    //Will find the closest karbonite to a set of coordinates and will output an array with the coordinates of the Karb
+    private int[] findKarbonite(int x1,int y1) {
+    	double minDist=9001; //IT's OVER NINE THOUSAND!!!!!!!!!!!!
+    	int x2=0;
+		int y2=0;
+		int[] closestCord=new int[2];
+		closestCord[0]=-1;
+		closestCord[1]=-1;
+		for(boolean[] a: karboniteMap) {
+        	         x2=0;
+			 for(boolean b: a) {
+				 if(b==true){ //If there is fuel
+					 if(Math.pow(x2-x1,2)+Math.pow(y2-y1, 2)<minDist) {
+						 minDist=Math.pow(x2-me.x,2)+Math.pow(y2-me.y, 2);
+						 closestCord[0]=x2;
+						 closestCord[1]=y2;
+					 }
+				 }
+			  x2++;
+			 }
+        	 y2++;
+        
+		}
+		return closestCord;
+    }
+    private int[] findCastle(int x1, int y1) {
+    	double minDist=9001; //IT's OVER NINE THOUSAND!!!!!!!!!!!!
+    	int x2=0;
+		int y2=0;
+		int[] closestCord=new int[2];
+		closestCord[0]=-1;
+		closestCord[1]=-1;
+		for(int[] a: getVisibleRobotMap()) {
+        	         x2=0;
+			 for(int b: a) {
+				 if(b>0&&getRobot(b).team==me.team&&getRobot(b).unit==0){
+					 if(Math.pow(x2-x1,2)+Math.pow(y2-y1, 2)<minDist) {
+						 minDist=Math.pow(x2-me.x,2)+Math.pow(y2-me.y, 2);
+						 closestCord[0]=x2;
+						 closestCord[1]=y2;
+					 }
+				 }
+			  x2++;
+			 }
+        	 y2++;
+        
+		}
+		return closestCord; //Returns array of length 2 of castle coordinates
+    }
+    private int[] route(int x1, int y1, int x2, int y2) {
+    	int x=x2-x1;
+    	int y=y2-y1;
+		if(x>1){x=1;}
+		if(x<-1){x=-1;}
+		if(y>1){y=1;}
+		if(y<-1){y=-1;}
+		int route[] = {x,y};
+		return route;
+    }
+    private double distance(int x1, int y1, int x2, int y2) {
+    	return Math.sqrt(Math.pow((double)x1-x2, 2)+Math.pow((double)y1-y2, 2));
+    }
 }
