@@ -58,7 +58,7 @@ public class MyRobot extends BCAbstractRobot {
         	         x2=0;
 			 for(boolean b: a) {
 				 if(b==true){ //If there is fuel
-					 if(Math.pow(x2-x1,2)+Math.pow(y2-y1, 2)<minDist) {
+					 if(Distance(x1,y1,x2,y2)<minDist) {
 						 minDist=Math.pow(x2-me.x,2)+Math.pow(y2-me.y, 2);
 						 closestCord[0]=x2;
 						 closestCord[1]=y2;
@@ -82,7 +82,7 @@ public class MyRobot extends BCAbstractRobot {
         	         x2=0;
 			 for(int b: a) {
 				 if(b>0&&getRobot(b).team==me.team&&getRobot(b).unit==0){
-					 if(Math.pow(x2-x1,2)+Math.pow(y2-y1, 2)<minDist) {
+					 if(distance(x1,y1,x2,y2)<minDist) {
 						 minDist=Math.pow(x2-me.x,2)+Math.pow(y2-me.y, 2);
 						 closestCord[0]=x2;
 						 closestCord[1]=y2;
@@ -95,7 +95,9 @@ public class MyRobot extends BCAbstractRobot {
 		}
 		return closestCord; //Returns array of length 2 of castle coordinates
     }
+     //Return the coordinates to move to to get to some coordinates. Returns array In format {x,y}.
     private int[] route(int x1, int y1, int x2, int y2) {
+	//This function assumes you can only move to an adjacent square
     	int x=x2-x1;
     	int y=y2-y1;
 		if(x>1){x=1;}
