@@ -58,7 +58,7 @@ public class MyRobot extends BCAbstractRobot {
         	         x2=0;
 			 for(boolean b: a) {
 				 if(b==true){ //If there is fuel
-					 if(Distance(x1,y1,x2,y2)<minDist) {
+					 if(distance(x1,y1,x2,y2)<minDist) {
 						 minDist=Math.pow(x2-me.x,2)+Math.pow(y2-me.y, 2);
 						 closestCord[0]=x2;
 						 closestCord[1]=y2;
