@@ -55,8 +55,8 @@ public class MyRobot extends BCAbstractRobot {
         	         x2=0;
 			 for(boolean b: a) {
 				 if(b==true){ //If there is fuel
-					 if(Math.pow(x2-x1,2)+Math.pow(y2-y1, 2)<minDist) {
-						 minDist=Math.pow(x2-me.x,2)+Math.pow(y2-me.y, 2);
+					 if(distance(me.x,me.y,x2,y2)<minDist) {
+						 minDist=distance(me.x,me.y,x2,y2);
 						 closestCord[0]=x2;
 						 closestCord[1]=y2;
 					 }
@@ -79,8 +79,8 @@ public class MyRobot extends BCAbstractRobot {
         	         x2=0;
 			 for(int b: a) {
 				 if(b>0&&getRobot(b).team==me.team&&getRobot(b).unit==0){
-					 if(Math.pow(x2-x1,2)+Math.pow(y2-y1, 2)<minDist) {
-						 minDist=Math.pow(x2-me.x,2)+Math.pow(y2-me.y, 2);
+					 if(distance(me.x,me.y,x2,y2)<minDist) {
+						 minDist=distance(me.x,me.y,x2,y2);
 						 closestCord[0]=x2;
 						 closestCord[1]=y2;
 					 }
@@ -103,8 +103,8 @@ public class MyRobot extends BCAbstractRobot {
         	         x2=0;
 			 for(int b: a) {
 				 if(b>0&&getRobot(b).team!=me.team&&getRobot(b).unit==0){
-					 if(Math.pow(x2-x1,2)+Math.pow(y2-y1, 2)<minDist) {
-						 minDist=Math.pow(x2-me.x,2)+Math.pow(y2-me.y, 2);
+					 if(distance(me.x,me.y,x2,y2)<minDist) {
+						 minDist=distance(me.x,me.y,x2,y2);
 						 closestCord[0]=x2;
 						 closestCord[1]=y2;
 					 }
