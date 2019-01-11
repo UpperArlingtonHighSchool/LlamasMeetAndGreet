@@ -6,16 +6,17 @@ public class MyRobot extends BCAbstractRobot {
     	turn++;
 
     	if (me.unit == SPECS.CASTLE) {
-    		for(int x=-1;x<2;x++) {
-    			for(int y=-1;y<2;y++) {
-    				if(x==0&&y==0)continue;
-    				if(isClear(me.x+x,me.y+y)&&fuel>49&&karbonite>9) {
-    					return buildUnit(SPECS.PILGRIM,x,y);
+    		if(turn<3) {
+    			for(int x=-1;x<2;x++) {
+    				for(int y=-1;y<2;y++) {
+    					if(x==0&&y==0)continue;
+    					if(isClear(me.x+x,me.y+y)&&fuel>49&&karbonite>9) {
+    						return buildUnit(SPECS.PILGRIM,x,y);
+    					}	
     				}
     			}
     		}
     	}
-   
     	if (me.unit == SPECS.PILGRIM) {
     		if(me.karbonite<19&&fuel>5) {
     			int[] CloseKarbCords=findKarbonite(me.x,me.y);//Find closest karbonite
