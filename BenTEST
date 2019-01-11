@@ -10,29 +10,8 @@ public class MyRobot extends BCAbstractRobot {
     			log("Building a pilgrim.");
     			return buildUnit(SPECS.PILGRIM,1,0);
     		}
-    		if(turn==2) {
-    			log("Building crusader");
-    			return buildUnit(SPECS.CRUSADER,1,0);
-    		}
     	}
-    	if(me.unit==SPECS.CRUSADER) {
-    		int[] CloseCastleCords=findEnemyCastle(me.x,me.y);
-    		double distance = distance(me.x,me.y,CloseCastleCords[0],CloseCastleCords[1]);
-    		log("CASTLE IS at: " + CloseCastleCords +". Distance is" +distance);
-		if(distance>15&&distance<36) {
-    			int[] route=route(me.x,me.y,CloseCastleCords[0],CloseCastleCords[1]);
-    			return move(route[0],route[1]);
-    		}else if(distance<16) {
-			log("ATTACKING!");
-    			return attack(CloseCastleCords[0]-me.x,CloseCastleCords[1]-me.y);
-    		} else if(distance>35) {
-    			if(map[me.y+1][me.x+1]) {return move(1,1);}
-    			if(map[me.y+1][me.x-1]) {return move(-1,1);}
-    			if(map[me.y-1][me.x+1]) {return move(1,-1);}
-    			if(map[me.y-1][me.x-1]) {return move(-1,-1);}
-    		}
-    		
-    	}
+   
     	if (me.unit == SPECS.PILGRIM) {
     		if(me.karbonite<19&&fuel>5) {
     			int[] CloseKarbCords=findKarbonite(me.x,me.y);//Find closest karbonite
@@ -41,25 +20,16 @@ public class MyRobot extends BCAbstractRobot {
 			if(distance(me.x,me.y,xKarb,yKarb)==0){
 				return mine();
 			}else{
-				int[] route=route(me.x,me.y,xKarb,yKarb); 
-	        		int xRoute=route[0];
-				int yRoute=route[1];
-				log("AT: " + me.x + "," +me.y + "TRYING TO TO: " + CloseKarbCords + "GO: "+xRoute+" "+yRoute);
-				return move(xRoute, yRoute);
+				return route(me.x,me.y,xKarb,yKarb); 
 			}
 		}else if(me.karbonite>18){ //If storage is full, go to castle
 			int[] CloseCastleCords=findCastle(me.x,me.y);
 			int xCastle=CloseCastleCords[0];
-			int yCastle=CloseCastleCords[1];
-			int[] route=route(me.x,me.y,xCastle,yCastle); 
-			int xRoute=route[0];
-			int yRoute=route[1];
-			log("CLOSEST CASTE IS at: "+xCastle+" "+yCastle);
+			int yCastle=CloseCastleCords[1]; 
 			if(distance(me.x,me.y,xCastle,yCastle)<2){
-				return give(xRoute,yRoute,me.karbonite,0);
+				return give(xCastle-me.x,yCastle-me.y,me.karbonite,0);
 			}else{
-				log("TRYING TO GO: "+xRoute+" "+yRoute);
-				return move(xRoute, yRoute);
+				return route(me.x,me.y,xCastle,yCastle);
 			}
 		}
     	}
@@ -79,7 +49,7 @@ public class MyRobot extends BCAbstractRobot {
         	         x2=0;
 			 for(boolean b: a) {
 				 if(b==true){ //If there is fuel
-					 if(distance(x1,y1,x2,y2)<minDist) {
+					 if(Math.pow(x2-x1,2)+Math.pow(y2-y1, 2)<minDist) {
 						 minDist=Math.pow(x2-me.x,2)+Math.pow(y2-me.y, 2);
 						 closestCord[0]=x2;
 						 closestCord[1]=y2;
@@ -103,7 +73,7 @@ public class MyRobot extends BCAbstractRobot {
         	         x2=0;
 			 for(int b: a) {
 				 if(b>0&&getRobot(b).team==me.team&&getRobot(b).unit==0){
-					 if(distance(x1,y1,x2,y2)<minDist) {
+					 if(Math.pow(x2-x1,2)+Math.pow(y2-y1, 2)<minDist) {
 						 minDist=Math.pow(x2-me.x,2)+Math.pow(y2-me.y, 2);
 						 closestCord[0]=x2;
 						 closestCord[1]=y2;
@@ -116,42 +86,37 @@ public class MyRobot extends BCAbstractRobot {
 		}
 		return closestCord; //Returns array of length 2 of castle coordinates
     }
-    private int[] findEnemyCastle(int x1, int y1) {
-    	double minDist=9001; //IT's OVER NINE THOUSAND!!!!!!!!!!!!
-    	int x2=0;
-		int y2=0;
-		int[] closestCord=new int[2];
-		closestCord[0]=100000;
-		closestCord[1]=100000;
-		for(int[] a: getVisibleRobotMap()) {
-        	         x2=0;
-			 for(int b: a) {
-				 if(b>0&&getRobot(b).team!=me.team&&getRobot(b).unit==0){
-					 if(distance(x1,y1,x2,y2)<minDist) {
-						 minDist=Math.pow(x2-me.x,2)+Math.pow(y2-me.y, 2);
-						 closestCord[0]=x2;
-						 closestCord[1]=y2;
-					 }
-				 }
-			  x2++;
-			 }
-        	 y2++;
-		}
-		return closestCord; //Returns array of length 2 of castle coordinates
-    }
-     //Return the coordinates to move to to get to some coordinates. Returns array In format {x,y}.
-    private int[] route(int x1, int y1, int x2, int y2) {
-	//This function assumes you can only move to an adjacent square. IT DOES NOT ACCOUNT FOR OBSTACLES
-    	int x=x2-x1;
-    	int y=y2-y1;
-		if(x>1){x=1;}
-		if(x<-1){x=-1;}
-		if(y>1){y=1;}
-		if(y<-1){y=-1;}
-		int route[] = {x,y};
-		return route;
+    private MoveAction route(int xCo, int yCo, int xTarget, int yTarget) {
+    	int xMove=xTarget-xCo;
+    	int yMove=yTarget-yCo;
+    	if(xMove*xMove+yMove*yMove>4) {
+			if(xMove>1){xMove=1;}
+			if(xMove<-1){xMove=-1;}
+			if(yMove>1){yMove=1;}
+			if(yMove<-1){yMove=-1;}
+    	}
+    	if(isClear(xCo+xMove,yCo+yMove)==false) {
+    		//The path isn't passable, check alternates, find choice that get's closest to goal
+    		double minDistance=9001;
+    		for(int x=-1;x<2;x++) {
+    			for(int y=-1;y<2;y++) {
+    				if(x==0&&y==0)continue;
+    				if(distance(xCo+x,yCo+y,xTarget,yTarget)<minDistance&&isClear(xCo+x,yCo+y)) {
+    					minDistance=distance(xCo+x,yCo+y,xTarget,yTarget);
+    					xMove=x;
+    					yMove=y;
+    				}
+    			}
+    		}
+    	}
+		return move(xMove,yMove);
     }
     private double distance(int x1, int y1, int x2, int y2) {
     	return Math.sqrt(Math.pow((double)x1-x2, 2)+Math.pow((double)y1-y2, 2));
+    }
+    //Return true if it's clear
+    private boolean isClear(int x, int y) {
+    	return map[y][x] && (getVisibleRobotMap()[y][x]==0) && (x>-1)&&(y>-1);
+    	
     }
 }
