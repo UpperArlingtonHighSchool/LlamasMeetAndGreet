@@ -7,6 +7,7 @@ public class MyRobot extends BCAbstractRobot {
 
     	if (me.unit == SPECS.CASTLE) {
     		if(turn<3) {
+    			log("ENEMY CASTLE IS AT: " + findEnemyCastle(me.x,me.y));
     			for(int x=-1;x<2;x++) {
     				for(int y=-1;y<2;y++) {
     					if(x==0&&y==0)continue;
@@ -91,6 +92,30 @@ public class MyRobot extends BCAbstractRobot {
 		}
 		return closestCord; //Returns array of length 2 of castle coordinates
     }
+    private int[] findEnemyCastle(int x1, int y1) {
+    	double minDist=9001; //IT's OVER NINE THOUSAND!!!!!!!!!!!!
+    	int x2=0;
+		int y2=0;
+		int[] closestCord=new int[2];
+		closestCord[0]=-1;
+		closestCord[1]=-1;
+		for(int[] a: getVisibleRobotMap()) {
+        	         x2=0;
+			 for(int b: a) {
+				 if(b>0&&getRobot(b).team!=me.team&&getRobot(b).unit==0){
+					 if(Math.pow(x2-x1,2)+Math.pow(y2-y1, 2)<minDist) {
+						 minDist=Math.pow(x2-me.x,2)+Math.pow(y2-me.y, 2);
+						 closestCord[0]=x2;
+						 closestCord[1]=y2;
+					 }
+				 }
+			  x2++;
+			 }
+        	 y2++;
+        
+		}
+		return closestCord; //Returns array of length 2 of castle coordinates
+    }
     private MoveAction route(int xCo, int yCo, int xTarget, int yTarget) {
     	int xMove=xTarget-xCo;
     	int yMove=yTarget-yCo;
@@ -121,7 +146,7 @@ public class MyRobot extends BCAbstractRobot {
     }
     //Return true if it's clear
     private boolean isClear(int x, int y) {
-    	return map[y][x] && (getVisibleRobotMap()[y][x]==0) && (x>-1)&&(y>-1);
+    	return (x>-1)&&(y>-1)&&map[y][x] && (getVisibleRobotMap()[y][x]==0);
     	
     }
 }
