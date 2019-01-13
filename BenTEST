@@ -31,7 +31,7 @@ public class MyRobot extends BCAbstractRobot {
     		int[] EnemyCords=findEnemyCastle(me.x,me.y);
     		int xCord=EnemyCords[0];
     		int yCord=EnemyCords[1];
-    		if(xCord==0&&yCord==0) {
+    		if(xCord==0&&yCord==0) {//Try moving somewhere randomly if you cannot find the castle
     			int i=0;
     			while(i<20) {
     				xCord=(int)(Math.random()*6-3);
@@ -42,7 +42,7 @@ public class MyRobot extends BCAbstractRobot {
     				i++;
     			}
     		}
-    		if(distance(me.x,me.y,xCord,yCord)<9&&distance(me.x,me.y,xCord,yCord)>3) {
+    		if(distance(me.x,me.y,xCord,yCord)<9&&distance(me.x,me.y,xCord,yCord)>3) {//Attack if within range
     			return attack(xCord-me.x,yCord-me.y);
     		}
     	}
@@ -57,7 +57,7 @@ public class MyRobot extends BCAbstractRobot {
 					return route(me.x,me.y,xCastle,yCastle);
 				}
 			}
-    		if(me.karbonite>0||fuel>200) {
+    		if(me.karbonite>0||fuel>200) {//If you have enough fuel, find some carbonite or if you've already started mining
     			int[] CloseKarbCords=findKarbonite(me.x,me.y);//Find closest karbonite
     			int xKarb=CloseKarbCords[0];//Store coordinates of closest Karbonite
     			int yKarb=CloseKarbCords[1];
