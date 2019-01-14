@@ -4,7 +4,25 @@ public class MyRobot extends BCAbstractRobot {
 
     public Action turn() {
     	turn++;
-
+    	
+    	
+    	if(me.unit == SPECS.CASTLE) {
+    		if(turn == 1) {
+    			log("Built crusader");
+    			return buildUnit(SPECS.CRUSADER, 1, 1);
+    		}
+    	}
+    	
+    	int[] EnemyCastleCords = findEnemyCastle(me.x, me.y);
+    	
+    	if(me.unit == SPECS.CRUSADER) {
+    		return route(me.x, me.y, EnemyCastleCords[0], EnemyCastleCords[1], 0);
+    	}
+    	
+    	return null;
+    }
+    	
+    	/*
     	if (me.unit == SPECS.CASTLE) {
     		if(turn<3) {
     			log("ENEMY CASTLE IS AT: " + findEnemyCastle(me.x,me.y));
@@ -54,7 +72,7 @@ public class MyRobot extends BCAbstractRobot {
 				if(distance(me.x,me.y,xCastle,yCastle)<2){
 					return give(xCastle-me.x,yCastle-me.y,me.karbonite,me.fuel);
 				}else{
-					return route(me.x,me.y,xCastle,yCastle);
+					return route(me.x,me.y,xCastle,yCastle,1);
 				}
 			}
     		if(me.karbonite>0||fuel>300) {//If you have enough fuel, find some carbonite or if you've already started mining
@@ -64,7 +82,7 @@ public class MyRobot extends BCAbstractRobot {
     			if(distance(me.x,me.y,xKarb,yKarb)==0){
     				return mine();
     			}else{
-    				return route(me.x,me.y,xKarb,yKarb); 
+    				return route(me.x,me.y,xKarb,yKarb,0); 
     			}
     		}
     			int[] CloseFuelCords=findFuel(me.x,me.y);//Find closest fuel
@@ -73,7 +91,7 @@ public class MyRobot extends BCAbstractRobot {
     			if(distance(me.x,me.y,xFuel,yFuel)==0){
     				return mine();
     			}else{
-    				return route(me.x,me.y,xFuel,yFuel); 
+    				return route(me.x,me.y,xFuel,yFuel,0); 
     			}
     	}
 
@@ -81,6 +99,11 @@ public class MyRobot extends BCAbstractRobot {
 
 	}
     //Will find the closest karbonite to a set of coordinates and will output an array with the coordinates of the Karb
+    
+    
+    
+    
+    */
     private int[] findKarbonite(int x1,int y1) {
     	double minDist=9001; //IT's OVER NINE THOUSAND!!!!!!!!!!!!
     	int x2=0;
@@ -91,7 +114,7 @@ public class MyRobot extends BCAbstractRobot {
 		for(boolean[] a: karboniteMap) {
         	 x2=0;
 			 for(boolean b: a) {
-				 if(b==true&&isClear(x2,y2)){ //If there is karbonite
+				 if(b==true){ //If there is karbonite
 					 if(distance(me.x,me.y,x2,y2)<minDist) {
 						 minDist=distance(me.x,me.y,x2,y2);
 						 closestCord[0]=x2;
@@ -115,7 +138,7 @@ public class MyRobot extends BCAbstractRobot {
 		for(boolean[] a: fuelMap) {
         	 x2=0;
 			 for(boolean b: a) {
-				 if(b==true&&isClear(x2,y2)){ //If there is fuel
+				 if(b==true){ //If there is fuel
 					 if(distance(me.x,me.y,x2,y2)<minDist) {
 						 minDist=distance(me.x,me.y,x2,y2);
 						 closestCord[0]=x2;
@@ -130,20 +153,20 @@ public class MyRobot extends BCAbstractRobot {
 		return closestCord;
     }
     private int[] findCastle(int x1, int y1) {
-    	double minDist=9001; //IT's OVER NINE THOUSAND!!!!!!!!!!!!
-    	int x2=0;
-		int y2=0;
-		int[] closestCord=new int[2];
-		closestCord[0]=-1;
-		closestCord[1]=-1;
+    	double minDist = 9001; //IT's OVER NINE THOUSAND!!!!!!!!!!!!
+    	int x2 = 0;
+		int y2 = 0;
+		int[] closestCord = new int[2];
+		closestCord[0] = -1;
+		closestCord[1] = -1;
 		for(int[] a: getVisibleRobotMap()) {
-        	 x2=0;
-			 for(int b: a) {
-				 if(b>0&&getRobot(b).team==me.team&&getRobot(b).unit==0){
-					 if(distance(x1,y1,x2,y2)<minDist) {
-						 minDist=distance(x1,y1,x2,y2);
-						 closestCord[0]=x2;
-						 closestCord[1]=y2;
+        	 x2 = 0;
+			 for(int b : a) {
+				 if(b > 0 && getRobot(b).team == me.team && getRobot(b).unit == 0){
+					 if(distance(x1,y1,x2,y2) < minDist) {
+						 minDist = distance(x1,y1,x2,y2);
+						 closestCord[0] = x2;
+						 closestCord[1] = y2;
 					 }
 				 }
 			  x2++;
@@ -153,6 +176,148 @@ public class MyRobot extends BCAbstractRobot {
 		}
 		return closestCord; //Returns array of length 2 of castle coordinates
     }
+    
+    
+    private AttackAction crusaderAttack(int x, int y) {
+    	double minDist = 9001; //IT's OVER NINE THOUSAND!!!!!!!!!!!!
+    	int x2 = 0;
+		int y2 = 0;
+		int xLength = 0;
+		int yLength = 0;
+		int[] closeEnemy = new int[2];
+		closeEnemy[0] = 0;
+		closeEnemy[1] = 0;
+		for(int[] a : getVisibleRobotMap()) {
+        	 x2 = 0;
+			 for(int b : a) {
+				 if(b > 0 && getRobot(b).team != me.team && getRobot(b).unit == 0){
+					 if(distance(me.x,me.y,x2,y2)<minDist) {
+						 minDist = distance(me.x,me.y,x2,y2);
+						 closeEnemy[0] = x2;
+						 closeEnemy[1] = y2;
+					 }
+				 }
+			  x2++;
+			 }
+        	 y2++;
+        
+		}
+    	
+		xLength = closeEnemy[0] - x;
+		yLength = closeEnemy[1] - y;
+				
+		if(Math.abs(xLength) > 4 || Math.abs(yLength) > 4) {
+			return null;
+		}
+		if(Math.abs(xLength) == 4 && Math.abs(yLength) == 0) {
+			return attack(xLength, 0);
+		}
+		if(Math.abs(yLength) == 4 && Math.abs(xLength) == 0) {
+			return attack(0, yLength);
+		}
+		if((Math.abs(xLength) + Math.abs(yLength)) < 5) {
+			return attack(xLength, yLength);
+		}
+		
+    	return null;
+    }
+    
+    private AttackAction preacherAttack(int x, int y) {
+    	double minDist = 9001; //IT's OVER NINE THOUSAND!!!!!!!!!!!!
+    	int x2 = 0;
+		int y2 = 0;
+		int xLength = 0;
+		int yLength = 0;
+		int[] closeEnemy = new int[2];
+		closeEnemy[0] = 0;
+		closeEnemy[1] = 0;
+		for(int[] a : getVisibleRobotMap()) {
+        	 x2 = 0;
+			 for(int b : a) {
+				 if(b > 0 && getRobot(b).team != me.team && getRobot(b).unit == 0){
+					 if(distance(me.x,me.y,x2,y2)<minDist) {
+						 minDist = distance(me.x,me.y,x2,y2);
+						 closeEnemy[0] = x2;
+						 closeEnemy[1] = y2;
+					 }
+				 }
+			  x2++;
+			 }
+        	 y2++;
+        
+		}
+    	
+		xLength = closeEnemy[0] - x;
+		yLength = closeEnemy[1] - y;
+				
+		if(Math.abs(xLength) > 4 || Math.abs(yLength) > 4) {
+			return null;
+		}
+		if(Math.abs(xLength) == 4 && Math.abs(yLength) == 0) {
+			return attack(xLength, 0);
+		}
+		if(Math.abs(yLength) == 4 && Math.abs(xLength) == 0) {
+			return attack(0, yLength);
+		}
+		if((Math.abs(xLength) + Math.abs(yLength)) < 5) {
+			return attack(xLength, yLength);
+		}
+		
+    	return null;
+    }
+    
+    
+    private AttackAction prophetAttack(int x, int y) {
+    	double minDist = 9001; //IT's OVER NINE THOUSAND!!!!!!!!!!!!
+    	int x2 = 0;
+		int y2 = 0;
+		int xLength = 0;
+		int yLength = 0;
+		int[] closeEnemy = new int[2];
+		closeEnemy[0] = 0;
+		closeEnemy[1] = 0;
+		for(int[] a : getVisibleRobotMap()) {
+        	 x2 = 0;
+			 for(int b : a) {
+				 if(b > 0 && getRobot(b).team != me.team && getRobot(b).unit == 0){
+					 if(distance(me.x,me.y,x2,y2)<minDist) {
+						 minDist = distance(me.x,me.y,x2,y2);
+						 closeEnemy[0] = x2;
+						 closeEnemy[1] = y2;
+					 }
+				 }
+			  x2++;
+			 }
+        	 y2++;
+        
+		}
+    	
+		xLength = closeEnemy[0] - x;
+		yLength = closeEnemy[1] - y;
+				
+		if(Math.abs(xLength) == 3 && Math.abs(yLength) == 3) {
+			return attack(xLength, yLength);
+		}
+		if(Math.abs(xLength) <= 3) {
+			return null;
+		}
+		if(Math.abs(yLength) <= 3) {
+			return null;
+		}
+		if(Math.abs(xLength) == 8 && Math.abs(yLength) == 0) {
+			return attack(xLength, yLength);
+		}
+		if(Math.abs(yLength) == 8 && Math.abs(xLength) == 0) {
+			return attack(xLength, yLength);
+		}
+		if((Math.abs(xLength) + Math.abs(yLength)) < 11) {
+			return attack(xLength, yLength);
+		}
+		
+    	return null;
+    }
+    
+    
     private int[] findEnemyCastle(int x1, int y1) {
     	double minDist=9001; //IT's OVER NINE THOUSAND!!!!!!!!!!!!
     	int x2=0;
@@ -163,7 +328,7 @@ public class MyRobot extends BCAbstractRobot {
 		for(int[] a: getVisibleRobotMap()) {
         	 x2=0;
 			 for(int b: a) {
-				 if(b>0&&getRobot(b).team!=me.team&&getRobot(b).unit==0){
+				 if(b > 0 && getRobot(b).team != me.team && getRobot(b).unit == 0){
 					 if(distance(me.x,me.y,x2,y2)<minDist) {
 						 minDist=distance(me.x,me.y,x2,y2);
 						 closestCord[0]=x2;
@@ -177,7 +342,13 @@ public class MyRobot extends BCAbstractRobot {
 		}
 		return closestCord; //Returns array of length 2 of castle coordinates
     }
-    private MoveAction route(int xCo, int yCo, int xTarget, int yTarget) {
+    
+    
+    
+    
+    
+    
+    private MoveAction route(int xCo, int yCo, int xTarget, int yTarget, int dist) {
     	int xMove=xTarget-xCo;
     	int yMove=yTarget-yCo;
     	if(xMove*xMove+yMove*yMove>4) {
@@ -193,6 +364,9 @@ public class MyRobot extends BCAbstractRobot {
     			for(int y=-2;y<3;y++) {
     				if((x==0&&y==0)||(x*x+y*y>4))continue;
     				if(isClear(xCo+x,yCo+y)) {
+    					if(dist==1&&distance(xCo+x,yCo+y,xTarget,yTarget)==1) {
+    						return move(x,y);
+    					}
     					//Think two moves in advance
     					for(int x2=-2;x2<3;x2++) {
     		    			for(int y2=-2;y2<3;y2++) {
